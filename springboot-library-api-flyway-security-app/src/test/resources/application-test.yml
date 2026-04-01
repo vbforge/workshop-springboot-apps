@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+jwt:
+  secret: dGVzdC1zZWNyZXQta2V5LXRoYXQtaXMtYXQtbGVhc3QtMjU2LWJpdHMtbG9uZy10ZXN0LWJpdHMtbG9uZy10ZXN0
+  expiration: 86400000
+
+app:
+  librarian:
+    username: ${LIBRARIAN_USERNAME:librarian}
+    email: ${LIBRARIAN_EMAIL:librarian@email.com}
+    password: ${LIBRARIAN_PASSWORD:Librarian12345!}
+
+
+logging:
+  level:
+    com.vbforge.libraryapi: DEBUG
+    org.springframework.security: WARN
