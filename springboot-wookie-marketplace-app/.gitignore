@@ -32,3 +32,7 @@ test-output/
 # Test reports
 target/surefire-reports/
 target/failsafe-reports/
+
+# Docker environment
+.env.docker
+mysql_data/

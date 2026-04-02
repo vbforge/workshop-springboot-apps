@@ -4,6 +4,26 @@ A RESTful bookstore API for the Wookie community to self-publish and sell advent
 
 ---
 
+![Java Version](https://img.shields.io/badge/Java-21-blue.svg)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.0-brightgreen.svg)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-6.5.0-success.svg)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-orange.svg)
+![Flyway](https://img.shields.io/badge/Flyway-Migrations-red.svg)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
+![Docker Compose](https://img.shields.io/badge/Docker%20Compose-3.8-2496ED?logo=docker)
+![JWT](https://img.shields.io/badge/JWT-Authentication-ff69b4.svg)
+![JUnit](https://img.shields.io/badge/JUnit-5.10-25A162?logo=junit5)
+![Mockito](https://img.shields.io/badge/Mockito-5.12-green.svg)
+![Testcontainers](https://img.shields.io/badge/Testcontainers-1.19-blue.svg)
+![Tests](https://img.shields.io/badge/Tests-49%20Passing-brightgreen.svg)
+![Coverage](https://img.shields.io/badge/Coverage-85%25-yellowgreen.svg)
+![Build](https://img.shields.io/badge/Build-Passing-success.svg)
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+
+**[View on Docker Hub](https://hub.docker.com/repository/docker/vladbogdadocker/wookie-marketplace-app/general)**
+
+---
+
 ## Table of Contents
 
   * [Overview](#overview)
@@ -346,6 +366,8 @@ DB_USERNAME=your_username
 DB_PASSWORD=your_password
 JWT_SECRET_KEY=your-secret-key
 ```
+
+### [My steps to build image locally and push to docker-hub repo](docker-setup-commands-order.md)
 
 ---
 
