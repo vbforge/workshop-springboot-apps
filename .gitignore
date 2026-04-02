@@ -1,0 +1,34 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Build
+target/
+out/
+build/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+application-dev.yml
+application-docker.yml
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+test-output/
+
+# Test reports
+target/surefire-reports/
+target/failsafe-reports/
