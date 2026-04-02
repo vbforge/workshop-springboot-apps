@@ -1,7 +1,0 @@
-spring:
-  datasource:
-    username:
-      value: ${DB_USERNAME}
-    password:
-      value: ${DB_PASSWORD}
-
