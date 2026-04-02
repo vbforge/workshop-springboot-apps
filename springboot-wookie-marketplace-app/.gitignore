@@ -19,6 +19,7 @@ logs/
 .env
 application-dev.yml
 application-docker.yml
+application-integration.yml
 *.key
 *.pem
 
