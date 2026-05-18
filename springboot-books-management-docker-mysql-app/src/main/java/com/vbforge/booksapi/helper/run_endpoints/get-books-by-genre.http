@@ -1,0 +1,3 @@
+### Get books by genre
+GET http://localhost:8080/api/book/genre/Education
+Content-Type: application/json

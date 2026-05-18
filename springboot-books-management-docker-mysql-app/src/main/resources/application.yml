@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: springboot-books-management-docker-mysql-app
+
+  profiles:
+    active: local
+
+  Jackson:
+    serialization:
+      fail-on-empty-beans: false

@@ -1,0 +1,10 @@
+### Create a book
+POST http://localhost:8080/api/book
+Content-Type: application/json
+
+{
+  "title": "Docker Deep Dive",
+"description": "Comprehensive guide to Docker",
+"author": "Nigel Poulton",
+"genre": "Education"
+}

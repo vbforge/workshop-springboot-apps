@@ -1,0 +1,3 @@
+### Get book by ID
+GET http://localhost:8080/api/book/1
+Content-Type: application/json

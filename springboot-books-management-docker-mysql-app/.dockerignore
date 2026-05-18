@@ -1,0 +1,10 @@
+.git
+.gitignore
+.mvn
+.mvn/wrapper/maven-wrapper.jar
+target/
+*.log
+*.md
+.DS_Store
+docker-compose.yml
+README-old.md
