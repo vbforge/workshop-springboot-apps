@@ -32,3 +32,5 @@ test-output/
 # Test reports
 target/surefire-reports/
 target/failsafe-reports/
+
+desktop.ini

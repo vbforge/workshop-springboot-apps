@@ -1,0 +1,648 @@
+{
+  "info": {
+    "name": "Book Management REST API",
+    "description": "Complete API collection for Book Management System\n\nBase URL: http://localhost:8080\nSwagger: http://localhost:8080/swagger-ui.html",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "bookId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "authorId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "publisherId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "API Info",
+      "item": [
+        {
+          "name": "API Welcome",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api",
+              "host": ["{{baseUrl}}"],
+              "path": ["api"]
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          }
+        },
+        {
+          "name": "API Version",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/version",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "version"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "Create Book",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has success field\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test(\"Book created with correct data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data.title).to.eql('Sample Book');",
+                  "    pm.collectionVariables.set(\"bookId\", jsonData.data.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isbn\": \"978-0-999999-99-9\",\n  \"title\": \"Sample Book\",\n  \"description\": \"A great book about programming\",\n  \"publicationDate\": \"2024-01-15\",\n  \"price\": 29.99,\n  \"stockQuantity\": 100,\n  \"language\": \"English\",\n  \"pageCount\": 350,\n  \"categoryId\": 1,\n  \"publisherId\": 1,\n  \"authorIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books"]
+            }
+          }
+        },
+        {
+          "name": "Get All Books (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books?page=0&size=10&sortBy=title&direction=ASC",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books"],
+              "query": [
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"},
+                {"key": "sortBy", "value": "title"},
+                {"key": "direction", "value": "ASC"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Book by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/{{bookId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "{{bookId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Book by ISBN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/isbn/978-0-7475-3269-9",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "isbn", "978-0-7475-3269-9"]
+            }
+          }
+        },
+        {
+          "name": "Update Book",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Book Title\",\n  \"price\": 34.99,\n  \"stockQuantity\": 150\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/books/{{bookId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "{{bookId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Book Stock",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/{{bookId}}/stock?quantity=200",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "{{bookId}}", "stock"],
+              "query": [
+                {"key": "quantity", "value": "200"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Book",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/{{bookId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "{{bookId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Books",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/search?keyword=harry&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "search"],
+              "query": [
+                {"key": "keyword", "value": "harry"},
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Books by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/category/{{categoryId}}?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "category", "{{categoryId}}"],
+              "query": [
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Books by Author",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/author/{{authorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "author", "{{authorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Books by Publisher",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/publisher/{{publisherId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "publisher", "{{publisherId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Books by Price Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/price-range?minPrice=10.00&maxPrice=30.00",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "price-range"],
+              "query": [
+                {"key": "minPrice", "value": "10.00"},
+                {"key": "maxPrice", "value": "30.00"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Books In Stock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/in-stock",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "in-stock"]
+            }
+          }
+        },
+        {
+          "name": "Get Books with Low Stock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/low-stock?threshold=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "low-stock"],
+              "query": [
+                {"key": "threshold", "value": "10"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authors",
+      "item": [
+        {
+          "name": "Create Author",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Author\",\n  \"biography\": \"A talented writer\",\n  \"dateOfBirth\": \"1980-05-15\",\n  \"nationality\": \"American\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/authors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors"]
+            }
+          }
+        },
+        {
+          "name": "Get All Authors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors"]
+            }
+          }
+        },
+        {
+          "name": "Get Author by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/{{authorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "{{authorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Author",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Author Name\",\n  \"biography\": \"Updated biography\",\n  \"dateOfBirth\": \"1980-05-15\",\n  \"nationality\": \"British\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/{{authorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "{{authorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Author",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/{{authorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "{{authorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Authors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/search?name=rowling",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "search"],
+              "query": [
+                {"key": "name", "value": "rowling"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Authors by Nationality",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/nationality/British",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "nationality", "British"]
+            }
+          }
+        },
+        {
+          "name": "Get Books by Author",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/{{authorId}}/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "{{authorId}}", "books"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Science Fiction\",\n  \"description\": \"Books about futuristic concepts and technology\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "{{categoryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Category\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "{{categoryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "{{categoryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/search?name=fiction",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "search"],
+              "query": [
+                {"key": "name", "value": "fiction"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Categories with Books",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/with-books",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categories", "with-books"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Publishers",
+      "item": [
+        {
+          "name": "Create Publisher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Publishing House\",\n  \"address\": \"123 Main St, New York, NY\",\n  \"website\": \"https://newpublisher.com\",\n  \"contactEmail\": \"contact@newpublisher.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/publishers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "publishers"]
+            }
+          }
+        },
+        {
+          "name": "Get All Publishers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/publishers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "publishers"]
+            }
+          }
+        },
+        {
+          "name": "Get Publisher by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/publishers/{{publisherId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "publishers", "{{publisherId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Publisher",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Publisher Name\",\n  \"address\": \"456 New St, Boston, MA\",\n  \"website\": \"https://updatedpublisher.com\",\n  \"contactEmail\": \"info@updatedpublisher.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/publishers/{{publisherId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "publishers", "{{publisherId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Publisher",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/publishers/{{publisherId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "publishers", "{{publisherId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Publishers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/publishers/search?name=penguin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "publishers", "search"],
+              "query": [
+                {"key": "name", "value": "penguin"}
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
