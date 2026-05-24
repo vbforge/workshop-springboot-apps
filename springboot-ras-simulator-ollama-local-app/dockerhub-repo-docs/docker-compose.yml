@@ -1,0 +1,35 @@
+version: '3.9'
+services:
+  app:
+    image: vladbogdadocker/ras-simulator:latest
+    ports:
+      - "8080:8080"
+    environment:
+      RAS_OLLAMA_BASE-URL: http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - ras-network
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ras-network
+
+volumes:
+  ollama-data:
+
+networks:
+  ras-network:
+    driver: bridge

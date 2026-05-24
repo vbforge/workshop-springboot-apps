@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ras-simulator
+  thymeleaf:
+    cache: false
+    suffix: .html
+
+ras:
+  ollama:
+    # JUNIOR NOTE — two profiles in one:
+    # When running in IntelliJ directly: Ollama is on localhost:11434
+    # When running in Docker: "ollama" resolves via Docker's internal DNS
+    # The docker-compose.yml overrides this with RAS_OLLAMA_BASE-URL env var.
+    # So this default value is only used when you run from IntelliJ.
+    base-url: http://localhost:11434
+    model: llama3.2:3b
+    timeout: 120
+
+  questions:
+    file: classpath:questions.json

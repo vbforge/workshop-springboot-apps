@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Question ' + ${currentNumber} + ' — RAS Simulator'">Question</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:          #0f1117;
+            --surface:     #1a1d27;
+            --border:      #2a2d3a;
+            --text:        #e2e4ec;
+            --muted:       #8b8fa8;
+            --accent:      #7c6bff;
+            --accent-glow: rgba(124, 107, 255, 0.12);
+            --radius:      14px;
+        }
+
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(ellipse 80% 50% at 50% 30%, rgba(124,107,255,0.05) 0%, transparent 70%);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* ── Page fade-in ──────────────────────────────────────────────── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Progress bar ──────────────────────────────────────────────── */
+        .progress-wrap {
+            width: 100%;
+            max-width: 620px;
+            margin-bottom: 1.75rem;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-track {
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #a78bfa);
+            border-radius: 3px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ── Question dots ─────────────────────────────────────────────── */
+        .question-dots {
+            display: flex;
+            gap: 0.4rem;
+            justify-content: center;
+            margin-top: 0.6rem;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: background 0.3s;
+        }
+
+        .dot.active   { background: var(--accent); }
+        .dot.complete { background: rgba(124,107,255,0.4); }
+
+        /* ── Card ──────────────────────────────────────────────────────── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.75rem 3rem;
+            max-width: 620px;
+            width: 100%;
+            animation: fadeUp 0.45s ease 0.05s both;
+        }
+
+        .question-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .question-icon {
+            font-size: 1.75rem;
+            line-height: 1;
+        }
+
+        .question-badge {
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            background: rgba(124,107,255,0.1);
+            border: 1px solid rgba(124,107,255,0.2);
+            padding: 0.25rem 0.7rem;
+            border-radius: 99px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 0.9rem;
+            color: var(--text);
+        }
+
+        .question-hint {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.55;
+            margin-bottom: 1.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            border-left: 2px solid var(--accent);
+            border-radius: 0 6px 6px 0;
+        }
+
+        /* ── Textarea ──────────────────────────────────────────────────── */
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.975rem;
+            line-height: 1.65;
+            padding: 1rem 1.1rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        textarea::placeholder { color: var(--muted); }
+
+        /* ── Char counter ──────────────────────────────────────────────── */
+        .char-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.4rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .char-count {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .char-count.warn { color: #f0a06a; }
+
+        /* ── Submit button ─────────────────────────────────────────────── */
+        .btn-next {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 0.9rem 2rem;
+            font-size: 0.975rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 18px rgba(124, 107, 255, 0.28);
+        }
+
+        .btn-next:hover:not(:disabled) {
+            opacity: 0.92;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(124, 107, 255, 0.42);
+        }
+
+        .btn-next:active:not(:disabled) { transform: translateY(0); }
+
+        .btn-next:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-wrap">
+    <div class="progress-label">
+        <span th:text="'Question ' + ${currentNumber} + ' of ' + ${totalQuestions}">Question 1 of 6</span>
+        <span th:text="${progressPercent} + '%'">0%</span>
+    </div>
+    <div class="progress-track">
+        <div class="progress-fill" th:style="'width: ' + ${progressPercent} + '%'"></div>
+    </div>
+
+    <!-- Dot indicators — one per question -->
+    <div class="question-dots" id="dots"></div>
+</div>
+
+<div class="card">
+    <div class="question-meta">
+        <span class="question-icon" th:text="${question.icon}">🎯</span>
+        <span class="question-badge" th:text="'Question ' + ${currentNumber}">Question 1</span>
+    </div>
+
+    <p class="question-text" th:text="${question.text}">Question text</p>
+
+    <p class="question-hint" th:text="${question.hint}">Hint text</p>
+
+    <form th:action="@{/answer}" method="post">
+        <input type="hidden" name="questionId" th:value="${question.id}">
+        <textarea
+            name="answer"
+            id="answerField"
+            placeholder="Take your time. Write what comes naturally..."
+            maxlength="1000"
+            required
+            autofocus></textarea>
+
+        <div class="char-row">
+            <span class="char-count" id="charCount">0 / 1000</span>
+        </div>
+
+        <button type="submit" class="btn-next" id="submitBtn" disabled>
+            <span th:text="${currentNumber == totalQuestions} ? 'See My Results →' : 'Next Question →'">Next →</span>
+        </button>
+    </form>
+</div>
+
+<script>
+    // ── Render dot indicators ───────────────────────────────────────────────
+    const total   = [[${totalQuestions}]];
+    const current = [[${currentNumber}]];   // Thymeleaf inlines the value into JS
+
+    const dotsEl = document.getElementById('dots');
+    for (let i = 1; i <= total; i++) {
+        const d = document.createElement('div');
+        d.className = 'dot' + (i === current ? ' active' : i < current ? ' complete' : '');
+        dotsEl.appendChild(d);
+    }
+
+    // ── Textarea logic ──────────────────────────────────────────────────────
+    const textarea  = document.getElementById('answerField');
+    const submitBtn = document.getElementById('submitBtn');
+    const charCount = document.getElementById('charCount');
+
+    textarea.addEventListener('input', function () {
+        const len = this.value.length;
+        const trimmed = this.value.trim().length;
+        charCount.textContent = len + ' / 1000';
+        charCount.classList.toggle('warn', len > 800);
+        submitBtn.disabled = trimmed === 0;
+    });
+
+    // ── Prevent double-submit on slow connections ───────────────────────────
+    // JUNIOR NOTE: Without this, impatient users click twice and submit the
+    // same answer twice, advancing the index by 2 and skipping a question.
+    const form = document.querySelector('form');
+    form.addEventListener('submit', () => {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+    });
+</script>
+
+</body>
+</html>

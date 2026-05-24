@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "text": "What is the one outcome that, if achieved in the next 90 days, would make everything else feel secondary?",
+    "hint": "Think big but specific. Not 'be happy' — but 'finish my first deployed project'.",
+    "icon": "🎯"
+  },
+  {
+    "id": 2,
+    "text": "Describe that success as if it already happened. What does it look like, feel like, sound like?",
+    "hint": "Write in present tense. Your brain responds to vivid, specific images.",
+    "icon": "✨"
+  },
+  {
+    "id": 3,
+    "text": "What is currently pulling your attention away from this goal most often?",
+    "hint": "Be honest. Distractions, fears, other obligations — name them.",
+    "icon": "🌀"
+  },
+  {
+    "id": 4,
+    "text": "What small signal — something you could notice tomorrow — would tell you are moving in the right direction?",
+    "hint": "Not a big milestone. A tiny daily sign. A feeling, a habit, a result.",
+    "icon": "🔍"
+  },
+  {
+    "id": 5,
+    "text": "What have you already done that proves you are capable of achieving this goal?",
+    "hint": "Evidence matters. Your brain needs proof that you can do hard things.",
+    "icon": "💪"
+  },
+  {
+    "id": 6,
+    "text": "What is the single next physical action you could take in the next 24 hours toward this goal?",
+    "hint": "One action. Specific, small, and doable today. Not a plan — an action.",
+    "icon": "⚡"
+  }
+]

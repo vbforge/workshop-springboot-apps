@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyzing — RAS Simulator</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:      #0f1117;
+            --surface: #1a1d27;
+            --border:  #2a2d3a;
+            --text:    #e2e4ec;
+            --muted:   #8b8fa8;
+            --accent:  #7c6bff;
+        }
+
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(124,107,255,0.07) 0%, transparent 70%);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 3rem 3.5rem;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            animation: fadeUp 0.45s ease both;
+        }
+
+        /* ── Spinner ───────────────────────────────────────────────────── */
+        .spinner-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+            height: 56px;
+        }
+
+        /* Outer ring */
+        .spinner {
+            width: 52px;
+            height: 52px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.85s linear infinite;
+            position: absolute;
+        }
+
+        /* Inner ring — counter-rotates for a nice effect */
+        .spinner-inner {
+            width: 34px;
+            height: 34px;
+            border: 2px solid transparent;
+            border-bottom-color: rgba(124,107,255,0.4);
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite reverse;
+            position: absolute;
+            top: 9px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.65rem;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.875rem;
+            line-height: 1.65;
+            margin-bottom: 2rem;
+        }
+
+        /* ── Status message ────────────────────────────────────────────── */
+        .status-wrap {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            min-height: 2.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-style: italic;
+            transition: opacity 0.4s;
+        }
+
+        .status.fade { opacity: 0; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="spinner-wrap">
+        <div class="spinner"></div>
+        <div class="spinner-inner"></div>
+    </div>
+
+    <h2>Analyzing your answers...</h2>
+    <p class="subtitle">
+        The local AI is reading your responses<br>
+        and building your personal RAS profile.<br>
+        This takes around 15–30 seconds.
+    </p>
+
+    <div class="status-wrap">
+        <p class="status" id="statusMsg">Reading your answers...</p>
+    </div>
+</div>
+
+<script>
+    const messages = [
+        "Reading your answers...",
+        "Identifying your core goal...",
+        "Mapping your attention filters...",
+        "Crafting your focus anchor...",
+        "Building your action steps...",
+        "Generating personal insight...",
+        "Almost there...",
+    ];
+
+    let i = 0;
+    const el = document.getElementById('statusMsg');
+
+    // Fade out → change text → fade in
+    function cycleMessage() {
+        el.classList.add('fade');
+        setTimeout(() => {
+            i = (i + 1) % messages.length;
+            el.textContent = messages[i];
+            el.classList.remove('fade');
+        }, 400);
+    }
+
+    setInterval(cycleMessage, 3800);
+
+    // Trigger the actual blocking AI call — browser shows spinner while it waits
+    window.location.href = '/process';
+</script>
+</body>
+</html>

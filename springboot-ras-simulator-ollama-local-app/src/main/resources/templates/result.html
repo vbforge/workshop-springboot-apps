@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your RAS Profile — RAS Simulator</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #0f1117;
+            --surface:   #1a1d27;
+            --border:    #2a2d3a;
+            --text:      #e2e4ec;
+            --muted:     #8b8fa8;
+            --accent:    #7c6bff;
+            --success:   #5cb897;
+            --warm:      #f0a06a;
+            --radius:    14px;
+        }
+
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(124,107,255,0.07) 0%, transparent 70%);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 2rem 4rem;
+        }
+
+        /* ── Animations ────────────────────────────────────────────────── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stagger children with CSS custom property */
+        .stagger { animation: fadeUp 0.5s ease both; }
+        .stagger:nth-child(1) { animation-delay: 0.05s; }
+        .stagger:nth-child(2) { animation-delay: 0.15s; }
+        .stagger:nth-child(3) { animation-delay: 0.25s; }
+        .stagger:nth-child(4) { animation-delay: 0.35s; }
+        .stagger:nth-child(5) { animation-delay: 0.45s; }
+        .stagger:nth-child(6) { animation-delay: 0.55s; }
+
+        /* ── Page header ───────────────────────────────────────────────── */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 660px;
+            width: 100%;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .complete-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(92, 184, 151, 0.1);
+            border: 1px solid rgba(92, 184, 151, 0.28);
+            color: var(--success);
+            padding: 0.35rem 0.9rem;
+            border-radius: 99px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-bottom: 1.1rem;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.3px;
+        }
+
+        .page-sub {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ── Layout container ──────────────────────────────────────────── */
+        .content {
+            width: 100%;
+            max-width: 660px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* ── Generic section card ──────────────────────────────────────── */
+        .section-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.6rem 2rem;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-body {
+            font-size: 0.95rem;
+            line-height: 1.75;
+            color: var(--text);
+        }
+
+        /* ── Accent variants per section ───────────────────────────────── */
+        .card-goal   { border-left: 3px solid var(--accent); }
+        .card-filter { border-left: 3px solid #38bdf8; }
+        .card-action { border-left: 3px solid var(--success); }
+        .card-anchor { border-left: 3px solid var(--warm); }
+        .card-insight{ border-left: 3px solid #a78bfa; }
+
+        .card-goal   .section-label { color: var(--accent); }
+        .card-filter .section-label { color: #38bdf8; }
+        .card-action .section-label { color: var(--success); }
+        .card-anchor .section-label { color: var(--warm); }
+        .card-insight .section-label { color: #a78bfa; }
+
+        /* ── Focus anchor highlight ────────────────────────────────────── */
+        .anchor-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--warm);
+            font-style: italic;
+            text-align: center;
+            padding: 0.5rem 0;
+        }
+
+        /* ── Raw AI fallback (if sections couldn't be parsed) ──────────── */
+        .raw-result {
+            white-space: pre-wrap;
+            font-size: 0.92rem;
+            line-height: 1.8;
+        }
+
+        /* ── Your answers accordion ────────────────────────────────────── */
+        .answers-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .answers-toggle {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1.1rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .answers-toggle:hover { color: var(--text); }
+
+        .answers-toggle .arrow { transition: transform 0.3s; font-style: normal; }
+        .answers-toggle.open .arrow { transform: rotate(180deg); }
+
+        .answers-body {
+            display: none;
+            padding: 0 2rem 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .answers-body.open { display: block; }
+
+        .answer-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .answer-item:last-child { border-bottom: none; }
+
+        .answer-q {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 0.35rem;
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .answer-a {
+            font-size: 0.9rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* ── Action buttons ────────────────────────────────────────────── */
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-restart {
+            flex: 1;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 0.875rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 18px rgba(124,107,255,0.28);
+        }
+
+        .btn-restart:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(124,107,255,0.4);
+        }
+
+        .btn-print {
+            flex: 1;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 0.875rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .btn-print:hover { color: var(--text); border-color: var(--muted); }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="complete-badge">✓ Session Complete</div>
+    <h1>Your RAS Profile</h1>
+    <p class="page-sub">Based on your answers, here is what your brain should focus on.</p>
+</div>
+
+<div class="content" id="sectionsContainer">
+    <!--
+        JUNIOR NOTE — why render sections in JS, not Thymeleaf:
+        The AI returns a single text string with section headers like "🎯 CORE GOAL".
+        Thymeleaf runs server-side at render time — it can't split that string into
+        styled cards easily without a custom utility method or extra Java code.
+        JavaScript runs in the browser after render — perfect for this kind of
+        post-processing. We pass the raw string to JS via a hidden element,
+        then JS splits it into cards. Clean separation of concerns.
+    -->
+    <div id="rawResult" th:text="${result}" style="display:none"></div>
+</div>
+<br>
+
+<br>
+<!-- Your answers — collapsible -->
+<div class="content" style="margin-top: 0;">
+    <div class="answers-card stagger">
+        <button class="answers-toggle" id="answersToggle" onclick="toggleAnswers()">
+            <span>Your Answers</span>
+            <span class="arrow">▾</span>
+        </button>
+        <div class="answers-body" id="answersBody">
+            <div th:each="question : ${questions}" class="answer-item">
+                <div class="answer-q">
+                    <span th:text="${question.icon}">🎯</span>
+                    <span th:text="${question.text}">Question</span>
+                </div>
+                <div class="answer-a" th:text="${answers[question.id]}">Answer</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions stagger">
+        <form th:action="@{/restart}" method="post" style="flex:1">
+            <button type="submit" class="btn-restart" style="width:100%">↺ Start Again</button>
+        </form>
+        <button class="btn-print" onclick="window.print()">🖨 Save / Print</button>
+    </div>
+</div>
+
+<script>
+    // ── Parse AI sections into styled cards ─────────────────────────────────
+    //
+    // JUNIOR NOTE — the strategy here:
+    // The AI always returns text with our section headers as anchors.
+    // We split the full text on those known headers, then render each
+    // chunk as a card with the appropriate color accent.
+    // If parsing fails (AI ignored our format), we fall back to raw text display.
+
+    const sectionConfig = [
+        { key: '🎯 CORE GOAL',                        cls: 'card-goal',    label: '🎯 Core Goal',           anchor: false },
+        { key: '🔍 WHAT YOUR RAS SHOULD FILTER FOR',  cls: 'card-filter',  label: '🔍 Filter For',          anchor: false },
+        { key: '⚡ YOUR NEXT 3 ACTIONS',              cls: 'card-action',  label: '⚡ Next 3 Actions',      anchor: false },
+        { key: '💬 YOUR FOCUS ANCHOR',                cls: 'card-anchor',  label: '💬 Focus Anchor',        anchor: true  },
+        { key: '🧠 INSIGHT',                          cls: 'card-insight', label: '🧠 Insight',             anchor: false },
+    ];
+
+    function parseAndRender() {
+        const raw = document.getElementById('rawResult').textContent.trim();
+        const container = document.getElementById('sectionsContainer');
+        container.innerHTML = ''; // clear placeholder
+
+        // Try to split into sections by known headers
+        let remaining = raw;
+        const found = [];
+
+        for (let i = 0; i < sectionConfig.length; i++) {
+            const cfg = sectionConfig[i];
+            const idx = remaining.indexOf(cfg.key);
+            if (idx === -1) continue;
+
+            // Text before this header belongs to the previous section (trim it)
+            // Text after the header up to the next known header is this section's body
+            const afterHeader = remaining.slice(idx + cfg.key.length).trim();
+
+            // Find where the next section starts
+            let nextIdx = afterHeader.length;
+            for (let j = i + 1; j < sectionConfig.length; j++) {
+                const ni = afterHeader.indexOf(sectionConfig[j].key);
+                if (ni !== -1 && ni < nextIdx) nextIdx = ni;
+            }
+
+            const body = afterHeader.slice(0, nextIdx).trim();
+            found.push({ cfg, body });
+            remaining = afterHeader.slice(nextIdx);
+        }
+
+        if (found.length === 0) {
+            // AI ignored our format — show raw text as a single card
+            const card = makeCard('card-goal', '🤖 AI Analysis', raw, false);
+            card.classList.add('stagger');
+            container.appendChild(card);
+            return;
+        }
+
+        found.forEach((item, i) => {
+            const card = makeCard(item.cfg.cls, item.cfg.label, item.body, item.cfg.anchor);
+            card.classList.add('stagger');
+            container.appendChild(card);
+        });
+    }
+
+    function makeCard(cls, label, body, isAnchor) {
+        const card = document.createElement('div');
+        card.className = 'section-card ' + cls;
+
+        const labelEl = document.createElement('div');
+        labelEl.className = 'section-label';
+        labelEl.textContent = label;
+        card.appendChild(labelEl);
+
+        const bodyEl = document.createElement('div');
+        bodyEl.className = isAnchor ? 'section-body anchor-text' : 'section-body';
+        // Preserve line breaks from AI output
+        bodyEl.style.whiteSpace = 'pre-wrap';
+        bodyEl.textContent = body;
+        card.appendChild(bodyEl);
+
+        return card;
+    }
+
+    // ── Answers accordion ───────────────────────────────────────────────────
+    function toggleAnswers() {
+        const body   = document.getElementById('answersBody');
+        const toggle = document.getElementById('answersToggle');
+        const isOpen = body.classList.contains('open');
+        body.classList.toggle('open', !isOpen);
+        toggle.classList.toggle('open', !isOpen);
+    }
+
+    // Run on load
+    parseAndRender();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAS Simulator — Program Your Focus</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:           #0f1117;
+            --surface:      #1a1d27;
+            --surface-2:    #20233300;
+            --border:       #2a2d3a;
+            --text:         #e2e4ec;
+            --muted:        #8b8fa8;
+            --accent:       #7c6bff;
+            --accent-glow:  rgba(124, 107, 255, 0.18);
+            --success:      #5cb897;
+            --radius:       14px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            /* Subtle radial glow behind the card */
+            background-image: radial-gradient(ellipse 80% 50% at 50% 40%, rgba(124,107,255,0.06) 0%, transparent 70%);
+        }
+
+        /* ── Page fade-in ──────────────────────────────────────────────── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeUp 0.5s ease both;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 3rem 3.5rem;
+            max-width: 620px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* ── Brain icon ────────────────────────────────────────────────── */
+        .icon-wrap {
+            font-size: 3.25rem;
+            margin-bottom: 1.25rem;
+            display: block;
+            /* Gentle pulse */
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1);    opacity: 1;    }
+            50%       { transform: scale(1.07); opacity: 0.85; }
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.975rem;
+            margin-bottom: 2.25rem;
+            line-height: 1.65;
+        }
+
+        /* ── Info chips ────────────────────────────────────────────────── */
+        .chips {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2.25rem;
+        }
+
+        .chip {
+            background: rgba(124,107,255,0.1);
+            border: 1px solid rgba(124,107,255,0.25);
+            color: var(--accent);
+            border-radius: 99px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        /* ── What you get section ──────────────────────────────────────── */
+        .benefits {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.4rem 1.6rem;
+            margin-bottom: 2.25rem;
+            text-align: left;
+        }
+
+        .benefits-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            margin-bottom: 0.65rem;
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .benefit-row:last-child { margin-bottom: 0; }
+
+        .benefit-row .check {
+            color: var(--success);
+            flex-shrink: 0;
+            margin-top: 1px;
+            font-size: 0.8rem;
+        }
+
+        /* ── CTA button ────────────────────────────────────────────────── */
+        .btn-start {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 0.95rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            letter-spacing: 0.2px;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(124, 107, 255, 0.3);
+        }
+
+        .btn-start:hover {
+            opacity: 0.92;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(124, 107, 255, 0.45);
+        }
+
+        .btn-start:active { transform: translateY(0); box-shadow: none; }
+
+        .footer-note {
+            margin-top: 1.4rem;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <span class="icon-wrap">🧠</span>
+
+    <h1>RAS Simulator</h1>
+    <p class="subtitle">
+        Your brain filters millions of signals per second.<br>
+        Tell it what to look for — and it will find it.
+    </p>
+
+    <div class="chips">
+        <span class="chip" th:text="${totalQuestions} + ' questions'">6 questions</span>
+        <span class="chip">~5 minutes</span>
+        <span class="chip">Local AI · Private</span>
+    </div>
+
+    <div class="benefits">
+        <div class="benefits-label">What you'll get</div>
+        <div class="benefit-row"><span class="check">✓</span><span>A clear one-sentence statement of your core goal</span></div>
+        <div class="benefit-row"><span class="check">✓</span><span>What your RAS should actively filter for every day</span></div>
+        <div class="benefit-row"><span class="check">✓</span><span>3 concrete next actions based on your own answers</span></div>
+        <div class="benefit-row"><span class="check">✓</span><span>A personal focus anchor phrase to repeat daily</span></div>
+        <div class="benefit-row"><span class="check">✓</span><span>Honest insight into what your answers reveal</span></div>
+    </div>
+
+    <form th:action="@{/start}" method="post">
+        <button type="submit" class="btn-start">Begin Your Session →</button>
+    </form>
+
+    <p class="footer-note">🔒 Runs entirely on your machine. No data leaves your computer.</p>
+</div>
+</body>
+</html>
